@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grace & James's Wedding</title>
+
+    <style>
+      
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background-color: #fafafa;
+    text-align: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+
+/* Main website container */
+.container {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* Headings */
+h1 {
+    font-size: clamp(32px, 5vw, 45px);
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: clamp(25px, 4vw, 28px);
+}
+
+
+/* Cards for seating chart and photo section */
+.card {
+    width: 100%;
+    background: white;
+    padding: clamp(20px, 4vw, 30px);
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+/* Search box */
+input {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+
+/* Buttons */
+button {
+    width: 80%;
+    max-width: 300px;
+    margin-top: 15px;
+    padding: 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+/* Search result */
+#result {
+    margin-top: 25px;
+    font-size: clamp(16px, 3vw, 20px);
+}
+
+
+/* Photo section hidden until guest found */
+#photoSection {
+    display: none;
+}
+
+
+/* QR code and images */
+img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin-top: 20px;
+}
+
+
+/* Paragraph text */
+p {
+    font-size: clamp(15px, 2.5vw, 18px);
+    line-height: 1.6;
+}
+        footer {
+    width: 100%;
+    margin-top: 50px;
+    padding: 25px 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+    border-top: 1px solid #e5e5e5;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+footer a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* -------------------------
+   Mobile Devices
+-------------------------- */
+
+@media (max-width: 500px) {
+
+    body {
+        padding: 10px;
+    }
+
+
+    .card {
+        margin-top: 30px;
+        border-radius: 10px;
+    }
+
+
+    button {
+        max-width: 60%;
+    }
+
+
+    input {
+        font-size: 18px;
+    }
+
+}
+
+
+/* -------------------------
+   Tablets
+-------------------------- */
+
+@media (min-width: 601px) and (max-width: 1024px) {
+
+    .container {
+        max-width: 650px;
+    }
+
+}
+
+
+/* -------------------------
+   Large Screens
+-------------------------- */
+
+@media (min-width: 1200px) {
+
+    .container {
+        max-width: 850px;
+    }
+
+}
+        
+
+</style>
+   
+</head>
+<body>
+<div class="container">
+    <h1>Grace & James's Wedding</h1>
+
+    <p>
+        Welcome! Search for your name to find your table.
+    </p>
+
+    <div class="card">
+
+        <input
+            type="text"
+            id="guestName"
+            placeholder="Enter your full name"
+        >
+
+        <br>
+
+        <button onclick="findGuest()">
+            Find My Seat
+        </button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <div class="card" id="photoSection">
+
+        <h2>Share Your Memories</h2>
+
+        <p id="personalMessage"></p>
+
+        <p>
+            We'd love to see our wedding through your eyes!
+            Please upload any photos or videos you take
+            throughout the day.
+        </p>
+
+        <button onclick="openAlbum()">
+            Upload Photos & Videos
+        </button>
+
+        <p>Or scan the QR code below:</p>
+
+        <!-- Replace with your QR code -->
+        <img src="qr-code.png"
+             alt="Wedding Album QR Code">
+
+    </div>
+     <footer>
+    <p>Designed and developed by Vimbikai.</p>
+
+    <p>
+        Interested in a custom wedding seating chart for your event?
+    </p>
+
+    <p>
+        Call or text:
+        <a href="tel:+19784134210">(978) 413-4210</a>
+    </p>
+</footer>
+    </div>
+
+    <script>
+
+        const SHEET_URL =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbOPaPzqHawz95OAF97j8OD9zwOFewVXFuYzL9TPEWuNmLbELjDTl-PHPjd6YIOi7LyaeUCeN3QX2Z/pub?output=csv";
+
+        const ALBUM_LINK =
+            "https://www.icloud.com/sharedalbum/#B2CJtdOXmKFrrXa" ;
+
+        let guests = [];
+
+        async function loadGuests() {
+
+            const response =
+                await fetch(SHEET_URL);
+
+            const csv =
+                await response.text();
+
+            const rows =
+                csv.trim().split("\n");
+
+            for (let i = 1; i < rows.length; i++) {
+
+                const [name, table] =
+                    rows[i].split(",");
+
+                guests.push({
+                    name: name.trim(),
+                    table: table.trim()
+                });
+            }
+        }
+
+        async function findGuest() {
+
+            if (guests.length === 0) {
+                await loadGuests();
+            }
+
+            const search =
+                document
+                    .getElementById(
+                        "guestName"
+                    )
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+            const guest =
+                guests.find(
+                    g =>
+                        g.name.toLowerCase()
+                        === search
+                );
+
+            const result =
+                document.getElementById(
+                    "result"
+                );
+
+            const photoSection =
+                document.getElementById(
+                    "photoSection"
+                );
+
+            const personalMessage =
+                document.getElementById(
+                    "personalMessage"
+                );
+
+            if (guest) {
+
+                result.innerHTML = `
+                    <h2>
+                        Welcome,
+                        ${guest.name}!
+                    </h2>
+
+                    <p>
+                        You are seated at
+                        <b>Table ${guest.table}</b>.
+                    </p>
+                `;
+
+                personalMessage.innerHTML = `
+                    Hey ${guest.name},
+
+                    thank you for celebrating
+                    with us! We'd love for
+                    you to share any photos
+                    and videos you take today.
+                `;
+
+                photoSection.style.display =
+                    "block";
+
+            } else {
+
+                result.innerHTML =
+                    "<p>Guest not found.</p>";
+
+                photoSection.style.display =
+                    "none";
+            }
+        }
+
+        function openAlbum() {
+
+            window.open(
+                ALBUM_LINK,
+                "_blank"
+            );
+        }
+</script>
+    
+   
+
+</body>
+</html>
