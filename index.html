@@ -396,49 +396,74 @@
     }
 
 
-    async function findGuest() {
+    
+async function findGuest() {
 
-        if (guests.length === 0) {
-            await loadGuests();
+    if (guests.length === 0) {
+        await loadGuests();
+    }
+
+
+    const search =
+        document
+            .getElementById("guestName")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const guest =
+        guests.find(
+            g =>
+                g.name.toLowerCase() === search
+        );
+
+
+    const result =
+        document.getElementById("result");
+
+
+    const photoSection =
+        document.getElementById("photoSection");
+
+
+    const personalMessage =
+        document.getElementById("personalMessage");
+
+
+    if (guest) {
+
+        /*
+         * If the guest has NO Group ID,
+         * they are an individual guest.
+         *
+         * Only show their own name and table.
+         */
+
+        if (!guest.groupId || guest.groupId.trim() === "") {
+
+            result.innerHTML = `
+
+                <h2>
+                    Welcome, ${guest.name}!
+                </h2>
+
+                <p>
+                    You are seated at
+                    <b>Table ${guest.table}</b>.
+                </p>
+
+            `;
+
         }
 
+        /*
+         * If the guest HAS a Group ID,
+         * find everyone with the SAME
+         * Table Number AND Group ID.
+         */
 
-        const search =
-            document
-                .getElementById("guestName")
-                .value
-                .trim()
-                .toLowerCase();
-
-
-        const guest =
-            guests.find(
-                g =>
-                    g.name.toLowerCase() === search
-            );
-
-
-        const result =
-            document.getElementById("result");
-
-
-        const photoSection =
-            document.getElementById("photoSection");
-
-
-        const personalMessage =
-            document.getElementById("personalMessage");
-
-
-        if (guest) {
-
-            /*
-             * Find everyone who:
-             *
-             * 1. Is at the same table
-             * 2. Has the same Group ID
-             * 3. Is NOT the guest who searched
-             */
+        else {
 
             const seatedWithYou =
                 guests.filter(g =>
@@ -453,17 +478,13 @@
                 );
 
 
-            /*
-             * Create the list of people
-             * seated with the guest.
-             */
-
             let seatedWithYouHTML = "";
 
 
             if (seatedWithYou.length > 0) {
 
                 seatedWithYouHTML = `
+
                     <p>
                         <b>Seated with you:</b>
                     </p>
@@ -473,12 +494,18 @@
                         padding: 0;
                         margin: 10px 0;
                     ">
+
                         ${
                             seatedWithYou
-                                .map(g => `<li>${g.name}</li>`)
+                                .map(
+                                    g =>
+                                        `<li>${g.name}</li>`
+                                )
                                 .join("")
                         }
+
                     </ul>
+
                 `;
 
             }
@@ -499,37 +526,39 @@
 
             `;
 
-
-            personalMessage.innerHTML = `
-
-                Hey ${guest.name},
-
-                <br><br>
-
-                thank you for celebrating
-                with us! We'd love for
-                you to share any photos
-                and videos you take today.
-
-            `;
-
-
-            photoSection.style.display =
-                "block";
-
-
-        } else {
-
-            result.innerHTML =
-                "<p>Guest not found.</p>";
-
-
-            photoSection.style.display =
-                "none";
-
         }
 
+
+        personalMessage.innerHTML = `
+
+            Hey ${guest.name},
+
+            <br><br>
+
+            thank you for celebrating
+            with us! We'd love for
+            you to share any photos
+            and videos you take today.
+
+        `;
+
+
+        photoSection.style.display =
+            "block";
+
+
+    } else {
+
+        result.innerHTML =
+            "<p>Guest not found.</p>";
+
+
+        photoSection.style.display =
+            "none";
+
     }
+
+}
 
 
     function openAlbum() {
