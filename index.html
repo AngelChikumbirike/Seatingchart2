@@ -352,6 +352,7 @@
 </div>
 
 
+```html
 <script>
 
     const SHEET_URL =
@@ -376,14 +377,21 @@
         const rows =
             csv.trim().split("\n");
 
+
         for (let i = 1; i < rows.length; i++) {
 
-            const [name, table] =
+            const [name, table, groupId] =
                 rows[i].split(",");
 
+
             guests.push({
+
                 name: name.trim(),
-                table: table.trim()
+
+                table: table.trim(),
+
+                groupId: groupId.trim()
+
             });
         }
     }
@@ -425,7 +433,60 @@
 
         if (guest) {
 
+            /*
+             * Find everyone who:
+             *
+             * 1. Is at the same table
+             * 2. Has the same Group ID
+             * 3. Is NOT the guest who searched
+             */
+
+            const seatedWithYou =
+                guests.filter(g =>
+
+                    g.table === guest.table &&
+
+                    g.groupId === guest.groupId &&
+
+                    g.name.toLowerCase() !==
+                        guest.name.toLowerCase()
+
+                );
+
+
+            /*
+             * Create the list of people
+             * seated with the guest.
+             */
+
+            let seatedWithYouHTML = "";
+
+
+            if (seatedWithYou.length > 0) {
+
+                seatedWithYouHTML = `
+                    <p>
+                        <b>Seated with you:</b>
+                    </p>
+
+                    <ul style="
+                        list-style: none;
+                        padding: 0;
+                        margin: 10px 0;
+                    ">
+                        ${
+                            seatedWithYou
+                                .map(g => `<li>${g.name}</li>`)
+                                .join("")
+                        }
+                    </ul>
+                `;
+
+            }
+
+
             result.innerHTML = `
+
                 <h2>
                     Welcome, ${guest.name}!
                 </h2>
@@ -434,30 +495,41 @@
                     You are seated at
                     <b>Table ${guest.table}</b>.
                 </p>
+
+                ${seatedWithYouHTML}
+
             `;
 
 
             personalMessage.innerHTML = `
+
                 Hey ${guest.name},
+
                 <br><br>
+
                 thank you for celebrating
                 with us! We'd love for
                 you to share any photos
                 and videos you take today.
+
             `;
 
 
             photoSection.style.display =
                 "block";
 
+
         } else {
 
             result.innerHTML =
                 "<p>Guest not found.</p>";
 
+
             photoSection.style.display =
                 "none";
+
         }
+
     }
 
 
@@ -467,9 +539,9 @@
             ALBUM_LINK,
             "_blank"
         );
+
     }
 
 </script>
+```
 
-</body>
-</html>
