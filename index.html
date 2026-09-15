@@ -306,8 +306,8 @@
     <!-- =========================
          PHOTO SECTION
     ========================== -->
-
-    /* <div class="card" id="photoSection"> 
+<!--
+     <div class="card" id="photoSection"> 
 
         <h2>Share Your Memories</h2>
 
@@ -326,7 +326,7 @@
         
 
     </div>
-*/
+-->
 
     <!-- =========================
          FOOTER
@@ -423,12 +423,12 @@ async function findGuest() {
         document.getElementById("result");
 
 
-    const photoSection =
+    /*const photoSection =
         document.getElementById("photoSection");
 
 
     const personalMessage =
-        document.getElementById("personalMessage");
+        document.getElementById("personalMessage"); */
 
 
     if (guest) {
@@ -529,7 +529,7 @@ async function findGuest() {
         }
 
 
-        personalMessage.innerHTML = `
+       /* personalMessage.innerHTML = `
 
             Hey ${guest.name},
 
@@ -545,7 +545,7 @@ async function findGuest() {
 
         photoSection.style.display =
             "block";
-
+*/
 
     } else {
 
@@ -553,8 +553,8 @@ async function findGuest() {
             "<p>Guest not found.</p>";
 
 
-        photoSection.style.display =
-            "none";
+      /*  photoSection.style.display =
+            "none"; */
 
     }
 
